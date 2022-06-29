@@ -70,6 +70,11 @@ const RecordButton = styled(Button)`
   color: white;
 `;
 
+const UpdateButton = styled(Button)`
+  background: #ff5f70;
+  color: white;
+`;
+
 const CancleButton = styled(Button)`
   background: white;
   border: solid 1px;
@@ -97,11 +102,17 @@ export default function Editor() {
   const [ categoryList, setCategoryList ] = useState([]);
 
   const [disabled, setDisabled] = useState(false);
-  const { categoryId } = useParams();
+  const { postId } = useParams();
 
   // 카테고리 조회
   useEffect(() => {
     getCategories();
+    console.log("postId", postId);
+    if (postId) {
+      console.log("postId is not undefined", postId);
+      getPosts();
+    }
+
   }, []);
 
 
@@ -115,6 +126,15 @@ export default function Editor() {
         console.error(error);
       });
   };
+
+  function getPosts() {
+    axios.get('http://localhost:8080/board/posts/' + `${postId}`)
+    .then((res) => {
+      setTitle(res.data.title);
+      setContent(res.data.content);
+      setCategories(res.data.categoryName);
+    })
+  }
 
   const open = Boolean(anchorEl);
 
@@ -164,9 +184,29 @@ export default function Editor() {
         setDisabled(false);
       });
 
-      
-
   };
+
+  const onUpdatePost = (e) => {
+    setDisabled(true);
+
+    e.preventDefault();
+
+    setSuccessful(false);
+
+    axios.put('http://localhost:8080/board/posts/' + `${postId}`)
+    .then((res) => {
+      console.log('success', res);
+      setSuccessful(true);
+      navigate('/');
+    })
+    .catch((err) => {
+      console.log('error', err);
+      setSuccessful(false);
+      setDisabled(false);
+    });
+
+  }
+
 
   const onTitleHandler = (e) => {
     setTitle(e.target.value);
@@ -238,12 +278,14 @@ export default function Editor() {
           my: "10px",
           fontStyle: "bold"
         }}
+        value={title}
         onChange={onTitleHandler}
         InputProps={{ style: { fontSize: 26 } }}
       />
       <EditorBox
         UserId={currentUser.userId}
         SetContent={setContent}
+        Content={content}
       />
       <Box
         sx={{
@@ -257,13 +299,21 @@ export default function Editor() {
           <CancleButton onClick={onClickCancleButton} disableElevation>
             취소
           </CancleButton>
-          <RecordButton
-            onClick={onRegisterPost}
-            disableElevation
-            disabled={disabled}
-          >
-            Record
-          </RecordButton>
+
+        {
+          postId ? (
+            <UpdateButton variant="contained" onClick={onUpdatePost} disableElevation disabled={disabled}>Update</UpdateButton>
+          ):(
+            <RecordButton
+              onClick={onRegisterPost}
+              disableElevation
+              disabled={disabled}
+            >
+              Record
+            </RecordButton>
+            )
+        }
+
         </Stack>
       </Box>
     </Box>
