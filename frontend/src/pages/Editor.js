@@ -91,10 +91,8 @@ export default function Editor() {
   const [successful, setSuccessful] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [summary, setSummary] = useState("");
   const [categories, setCategories] = useState('');
   const [category_id, setCategory_Id] = useState('');
-
   const { user: currentUser } = useSelector((state) => state.auth);
   const [ categoryList, setCategoryList ] = useState([]);
 
@@ -140,11 +138,19 @@ export default function Editor() {
 
 
   const onRegisterPost = (e) => {
+
     setDisabled(true);
 
     e.preventDefault();
 
     setSuccessful(false);
+
+    
+    // TODO: summary의 html tag 제거
+    const contentWithoutTag = content.replace(/(<([^>]+)>)/ig, ""); // content에서 정규표현식을 이용해 tag 를 제거한 string
+    console.log("contentWithoutTag", contentWithoutTag.substring(0, 29));
+
+    const summary = contentWithoutTag.substring(0, 29);
 
     dispatch(registerPost(currentUser.userId, category_id, title, content, summary))
       .then((res) => {
@@ -157,6 +163,9 @@ export default function Editor() {
         setSuccessful(false);
         setDisabled(false);
       });
+
+      
+
   };
 
   const onTitleHandler = (e) => {
@@ -235,7 +244,6 @@ export default function Editor() {
       <EditorBox
         UserId={currentUser.userId}
         SetContent={setContent}
-        SetSummary={setSummary}
       />
       <Box
         sx={{

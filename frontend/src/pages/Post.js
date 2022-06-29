@@ -206,7 +206,10 @@ export default function Post() {
           alignItems: 'start',
         }}
       >
-      {postData.content}
+
+      {/* TODO: dangerouslySetInnerHTML 제거하자 */}
+      <div dangerouslySetInnerHTML={ {__html: postData.content}}></div>       
+      
       </Box>
 
       {/* 하단 작성자 프로필사진, 이름, 설명 */}

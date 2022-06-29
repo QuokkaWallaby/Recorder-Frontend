@@ -5,7 +5,7 @@ import './index.css';
 
 const API_URL = "http://localhost:8080/board/posts";
 
-export default function EditorBox ({ UserId, SetContent, SetSummary, Content }) {
+export default function EditorBox ({ UserId, SetContent, Content }) {
 
     function uploadAdapter(loader) {
         return {
@@ -52,17 +52,14 @@ export default function EditorBox ({ UserId, SetContent, SetSummary, Content }) 
             onChange={ 
                 ( event, editor ) => {
                 const data = editor.getData();
-                let convertContent = data.replace(/<(\/p|p)([^>]*)>/gi, "")
-                convertContent = convertContent.replace(/&nbsp;/gi,"");
-                SetContent(convertContent);
-                SetSummary(convertContent.substring(0, 29));
+                SetContent(data);
             } }
             onBlur={ ( event, editor ) => {
                 // console.log( 'Blur.', editor );
             } }
             onFocus={ ( event, editor ) => {
                 // console.log( 'Focus.', editor );
-            } }
+            } } 
         />
     )
 }
