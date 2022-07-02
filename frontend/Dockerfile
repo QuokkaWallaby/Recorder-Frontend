@@ -1,9 +1,20 @@
-FROM node:14.16.1-alpine
+FROM nginx:1.21.0
+
+# web build 결과 저장용 디렉토리 생성
+RUN mkdir -p /app/build
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+ADD ./build ./build
 
-ADD package.json /app/package.json
-RUN npm install
-RUN npm install react-scripts@3.4.1 -g
+# nginx 설정 add
+RUN rm /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/direct-seller-ui.conf
 
-CMD ["npm", "start"]
+# nginx log 디렉토리 생성
+RUN mkdir /etc/nginx/logs
+RUN chown -R nginx:root /etc/nginx/logs
+
+# expose http, https port
+EXPOSE 80
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]
